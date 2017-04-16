@@ -7,7 +7,7 @@
     </values>
     <values>
         <field>ParentField__c</field>
-        <value xsi:type="xsd:string">Product2Id</value>
+        <value xsi:type="xsd:string">OrderId</value>
     </values>
     <values>
         <field>SFObjectType__c</field>
