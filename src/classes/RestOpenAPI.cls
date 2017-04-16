@@ -35,6 +35,7 @@ global class RestOpenAPI {
             }
         }
 
+
         query += buildSubQuery('', 0, fieldMapping, mapFieldByLevel);
 
         query += ' FROM ' + mapFieldByLevel.get(1).get(0).SFObjectType__c;
@@ -105,33 +106,81 @@ global class RestOpenAPI {
 	@HttpPost
     global static void postService() {
     	webserviceInit();
-		String requestJson = RestContext.request.requestBody.toString();
-        Map<sObject, Object> result = OpenAPIUtils.deserialize(serviceName, requestJson, Order.class);
 
-        System.debug(result);
-        
-        insert new List<sObject>(result.keySet());
-
-        System.debug(result);
-
-        List<sObject> childToInsert = new List<sObject>();
-        for (sObject obj : result.keySet()) {
-        	System.debug('Id inserted object ' + obj.Id);
-        	Map<sObject, Object> childObjects = (Map<sObject, Object>) result.get(obj);
-
-        	System.debug(childObjects);
-
-        	for (sObject childObject : childObjects.keySet()) {
-        		childObject.put('ParentId', obj.Id);
-        	}
-        	childToInsert.addAll(childObjects.keySet());
-        }
-
-        insert childToInsert;
-        
+		genericPatchPost(false);
 
         RestContext.response.addHeader('Content-Type', 'application/json');
         
+    }
+
+	@HttpPatch
+    global static void patchService() {
+    	webserviceInit();
+		
+    	genericPatchPost(true);
+
+        RestContext.response.addHeader('Content-Type', 'application/json');
+    }
+
+    private static void genericPatchPost(Boolean isUpdate) {
+    	String requestJson = RestContext.request.requestBody.toString();
+
+		Map<String, String> mapObjectParentField = new Map<String, String>();
+		String mainType = '';
+
+		for (Open_API_Mapping__mdt entry : [SELECT Salesforce_Field_Name__c, Service__c, isSFChildObject__c, SFObjectType__c, isIdField__c, isSFParentObject__c, ParentField__c FROM Open_API_Mapping__mdt WHERE Service__c = :serviceName]) {
+			if (entry.isSFChildObject__c) {
+				mapObjectParentField.put(entry.SFObjectType__c, entry.ParentField__c);
+			} else if (entry.isIdField__c) {
+				mainType = entry.SFObjectType__c;
+			}
+		}
+
+
+        Map<sObject, Object> result = OpenAPIUtils.deserialize(serviceName, requestJson, Type.forName(mainType));
+
+        List<sObject> objectsToInsert = new List<sObject>();
+        List<Object> childObjectsGeneric = new List<Object>();
+        for (sObject parentObject : result.keySet()) {
+        	objectsToInsert.add(parentObject);
+        	childObjectsGeneric.add(result.get(parentObject));
+        }
+        
+        if (isUpdate) {
+        	update objectsToInsert;
+    	} else {
+        	insert objectsToInsert;
+		}
+        genericInsertChild(objectsToInsert, childObjectsGeneric, mapObjectParentField, isUpdate);
+    }
+
+    private static void genericInsertChild(List<sObject> parentInserted, List<Object> objectsToInsertGeneric, Map<String, String> mapObjectParentField, Boolean isUpdate) {
+        List<sObject> objectsToInsert = new List<sObject>();
+        List<Object> childObjectsGeneric = new List<Object>();
+        Iterator<Object> it = objectsToInsertGeneric.iterator();
+        for (sObject parent : parentInserted) {
+        	Map<sObject, Object> childObjects = (Map<sObject, Object>) it.next();
+        	if (childObjects != null && !childObjects.keySet().isEmpty()) {
+	        	for (sObject childObject : childObjects.keySet()) {
+	        		objectsToInsert.add(childObject);
+	        		String parentFieldName = mapObjectParentField.get(childObject.getSObjectType().getDescribe().getName());
+	        		childObject.put(parentFieldName, parent.Id); // To replace with query and generic population of parent field
+	        		childObjectsGeneric.add(childObjects.get(childObject));
+	        	}
+        	}
+
+        }
+
+        if (objectsToInsert.size() > 0) {
+	        if (isUpdate) {
+	        	update objectsToInsert;
+	    	} else {
+	        	insert objectsToInsert;
+			}
+    		genericInsertChild(objectsToInsert, childObjectsGeneric, mapObjectParentField, isUpdate);
+        } else {
+        	return;
+        }
     }
 
     private static void webserviceInit() {
