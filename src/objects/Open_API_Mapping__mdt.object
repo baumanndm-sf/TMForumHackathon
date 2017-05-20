@@ -3,6 +3,7 @@
     <fields>
         <fullName>Open_API_Field_Name__c</fullName>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>Open API Field Name</label>
         <length>255</length>
         <required>false</required>
@@ -12,6 +13,7 @@
     <fields>
         <fullName>ParentField__c</fullName>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>ParentField</label>
         <length>255</length>
         <required>false</required>
@@ -21,6 +23,7 @@
     <fields>
         <fullName>SFObjectType__c</fullName>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>SFObjectType</label>
         <length>40</length>
         <required>false</required>
@@ -30,6 +33,7 @@
     <fields>
         <fullName>Salesforce_Field_Name__c</fullName>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>Salesforce Field Name</label>
         <length>255</length>
         <required>false</required>
@@ -39,6 +43,7 @@
     <fields>
         <fullName>Service__c</fullName>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>Service</label>
         <length>255</length>
         <required>false</required>
@@ -49,6 +54,7 @@
         <fullName>isIdField__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>isIdField</label>
         <type>Checkbox</type>
     </fields>
@@ -56,6 +62,7 @@
         <fullName>isSFChildObject__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>isSFChildObject</label>
         <type>Checkbox</type>
     </fields>
@@ -63,6 +70,7 @@
         <fullName>isSFParentObject__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>isSFParentObject</label>
         <type>Checkbox</type>
     </fields>
@@ -70,6 +78,7 @@
         <fullName>isTMFChildObject__c</fullName>
         <defaultValue>false</defaultValue>
         <externalId>false</externalId>
+        <fieldManageability>DeveloperControlled</fieldManageability>
         <label>isTMFChildObject</label>
         <type>Checkbox</type>
     </fields>

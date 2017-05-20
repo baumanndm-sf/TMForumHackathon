@@ -9,7 +9,9 @@ public class OpenAPIUtils {
         for (Open_API_Mapping__mdt entry : [SELECT Open_API_Field_Name__c, Salesforce_Field_Name__c, Service__c, isSFChildObject__c, isTMFChildObject__c, SFObjectType__c FROM Open_API_Mapping__mdt WHERE Service__c = :service]) {
             fieldMapping.put(entry.Salesforce_Field_Name__c, entry);
         }
-
+        
+        System.debug('translation map : ' + fieldMapping);
+         
         if (objects != null) {
             for (sObject obj : objects) {
                 populatedFields = obj.getPopulatedFieldsAsMap();
@@ -164,7 +166,7 @@ public class OpenAPIUtils {
                     
                     sfFieldName = sfFieldName.replace(newPath, '');
                     newBody.put(sfFieldName, s);
-            	}
+                }
             }           
         }
         String newBodyString = Json.serialize(newBody);
